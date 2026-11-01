@@ -6,6 +6,7 @@ class Block:
         self.xpos = 0
         self.ypos = 0
         self.player_color =  None  # "Black", "White" oder None
+        self.is_selected = False
 grid = [[2,0,2,0,2,0,2,0],
         [0,2,0,2,0,2,0,2],
         [0,0,0,0,0,0,0,0],
@@ -66,7 +67,15 @@ def draw_board(grid):
                 pygame.draw.circle(screen, color, (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2), FIELD_SIZE // 2 - 5)
                 pygame.draw.circle(screen, BLACK, (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2), FIELD_SIZE // 2 - 5, 1)
 
-
+            if grid[ypos][xpos].is_selected:
+                pygame.draw.rect(screen, YELLOW , (xpos * FIELD_SIZE, ypos * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE), 5)
+            
+def get_mouse_pos():
+    pos = pygame.mouse.get_pos()
+    xpos = pos[0]
+    ypos = pos[1]
+    return ypos // FIELD_SIZE , xpos //FIELD_SIZE
+mouse_was_pressed = False
 
 clock = pygame.time.Clock()
 game_running = True
@@ -79,7 +88,23 @@ while game_running:
             pygame.quit()
             sys.exit()
 
-    
+
+    mouse_buttons = pygame.mouse.get_pressed()
+    if mouse_buttons[0]:  # [0] fuer links klick 
+        get_mouse_pos()
+        if not mouse_was_pressed:
+            if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == False:
+                grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True
+                print("marked")
+                mouse_was_pressed = True
+            elif grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == True:
+                grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = False
+                print("un marked")
+                mouse_was_pressed = True
+    else:
+        mouse_was_pressed = False
+       
+       
     draw_board(grid)
 
     pygame.display.flip()
