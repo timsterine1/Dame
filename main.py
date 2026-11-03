@@ -93,7 +93,7 @@ while game_running:
     if mouse_buttons[0]:  # [0] fuer links klick 
         get_mouse_pos()
         if not mouse_was_pressed:
-            if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == False:
+            if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == False and grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color != None:
                 grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True
                 print("marked")
                 mouse_was_pressed = True
