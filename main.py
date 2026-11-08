@@ -7,6 +7,8 @@ class Block:
         self.ypos = 0
         self.player_color =  None  # "Black", "White" oder None
         self.is_selected = False
+        self.can_move = False
+        self.have_to_move = False
 grid = [[2,0,2,0,2,0,2,0],
         [0,2,0,2,0,2,0,2],
         [0,0,0,0,0,0,0,0],
@@ -76,10 +78,28 @@ def get_mouse_pos():
     ypos = pos[1]
     return ypos // FIELD_SIZE , xpos //FIELD_SIZE
 mouse_was_pressed = False
+def check_moves():
 
+    if black_player_turn:
+        for ypos in range(BOARD_SIZE):
+            for xpos in range(BOARD_SIZE):
+                if grid[ypos][xpos].is_selected and grid[ypos][xpos].player_color == "Black":
+                    if ypos > 0 and xpos > 0 and grid[ypos - 1][xpos - 1].player_color == None:
+                        grid[ypos - 1][xpos - 1].can_move = True
+                    if ypos > 0 and xpos < BOARD_SIZE - 1 and grid[ypos - 1][xpos + 1].player_color == None:
+                        grid[ypos - 1][xpos + 1].can_move = True
+                    #check if the player can move
+ 
+                    #check if the player can jump over an opponent's piece
+                    if ypos > 1 and xpos > 1 and grid[ypos - 1][xpos - 1].player_color == "White" and grid[ypos - 2][xpos - 2].player_color == None:
+                        grid[ypos][xpos].have_to_move = True
+                    if ypos > 1 and xpos < BOARD_SIZE - 2 and grid[ypos - 1][xpos + 1].player_color == "White" and grid[ypos - 2][xpos + 2].player_color == None:
+                        grid[ypos][xpos].have_to_move = True
+                        
+                        
 clock = pygame.time.Clock()
 game_running = True
-
+black_player_turn = True
 
 while game_running:
     for event in pygame.event.get():
@@ -94,19 +114,21 @@ while game_running:
         get_mouse_pos()
         if not mouse_was_pressed:
             if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == False and grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color != None:
-                grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True
-                print("marked")
+                grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True # mark the selected field
+                for ypos in range(BOARD_SIZE):
+                    for xpos in range(BOARD_SIZE):
+                        if grid[ypos][xpos].is_selected == True and (ypos != get_mouse_pos()[0] or xpos != get_mouse_pos()[1]): # unmark the other fields
+                            grid[ypos][xpos].is_selected = False
                 mouse_was_pressed = True
             elif grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == True:
                 grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = False
-                print("un marked")
                 mouse_was_pressed = True
     else:
         mouse_was_pressed = False
        
        
     draw_board(grid)
-
+    check_moves()
     pygame.display.flip()
     clock.tick(FPS)
 
