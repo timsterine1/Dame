@@ -9,6 +9,10 @@ class Block:
         self.is_selected = False
         self.can_move = False
         self.have_to_move = False
+        self.can_move_left = False
+        self.can_move_right = False
+        self.take_right = False
+        self.take_left = False
 grid = [[2,0,2,0,2,0,2,0],
         [0,2,0,2,0,2,0,2],
         [0,0,0,0,0,0,0,0],
@@ -71,6 +75,16 @@ def draw_board(grid):
 
             if grid[ypos][xpos].is_selected:
                 pygame.draw.rect(screen, YELLOW , (xpos * FIELD_SIZE, ypos * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE), 5)
+                if black_player_turn:
+                    if grid[ypos][xpos].can_move_right:
+                        pygame.draw.circle(screen, (128, 128, 128), ((xpos + 1) * FIELD_SIZE + FIELD_SIZE // 2, (ypos - 1) * FIELD_SIZE + FIELD_SIZE // 2), 10)
+                    if grid[ypos][xpos].can_move_left:  
+                        pygame.draw.circle(screen, (128, 128, 128), ((xpos - 1) * FIELD_SIZE + FIELD_SIZE // 2, (ypos - 1) * FIELD_SIZE + FIELD_SIZE // 2), 10)
+                else:
+                    if grid[ypos][xpos].can_move_right:
+                        pygame.draw.circle(screen, (128, 128, 128), ((xpos + 1) * FIELD_SIZE + FIELD_SIZE // 2, (ypos + 1) * FIELD_SIZE + FIELD_SIZE // 2), 10)
+                    if grid[ypos][xpos].can_move_left:  
+                        pygame.draw.circle(screen, (128, 128, 128), ((xpos - 1) * FIELD_SIZE + FIELD_SIZE // 2, (ypos + 1) * FIELD_SIZE + FIELD_SIZE // 2), 10)
             
 def get_mouse_pos():
     pos = pygame.mouse.get_pos()
@@ -86,8 +100,10 @@ def check_moves():
                 if grid[ypos][xpos].is_selected and grid[ypos][xpos].player_color == "Black":
                     if ypos > 0 and xpos > 0 and grid[ypos - 1][xpos - 1].player_color == None:
                         grid[ypos - 1][xpos - 1].can_move = True
+                        grid[ypos][xpos].can_move_left = True
                     if ypos > 0 and xpos < BOARD_SIZE - 1 and grid[ypos - 1][xpos + 1].player_color == None:
                         grid[ypos - 1][xpos + 1].can_move = True
+                        grid[ypos][xpos].can_move_right = True
                     #check if the player can move
  
                     #check if the player can jump over an opponent's piece
@@ -125,8 +141,7 @@ while game_running:
                 mouse_was_pressed = True
     else:
         mouse_was_pressed = False
-       
-       
+
     draw_board(grid)
     check_moves()
     pygame.display.flip()
