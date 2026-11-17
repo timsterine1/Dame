@@ -126,11 +126,16 @@ while game_running:
 
 
     mouse_buttons = pygame.mouse.get_pressed()
+
+    #check if a tile can be selected
     if mouse_buttons[0]:  # [0] fuer links klick 
         get_mouse_pos()
         if not mouse_was_pressed:
             if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == False and grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color != None:
-                grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True # mark the selected field
+                if black_player_turn and grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color == "Black":
+                    grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True # mark the selected field
+                elif black_player_turn == False and grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color == "White":
+                    grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected = True # mark the selected field
                 for ypos in range(BOARD_SIZE):
                     for xpos in range(BOARD_SIZE):
                         if grid[ypos][xpos].is_selected == True and (ypos != get_mouse_pos()[0] or xpos != get_mouse_pos()[1]): # unmark the other fields
