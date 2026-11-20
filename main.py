@@ -104,10 +104,14 @@ def check_moves():
                         grid[ypos - 1][xpos - 1].can_move = True
                         grid[ypos][xpos].can_move_left = True
                         grid[ypos - 1][xpos - 1].is_marked = True
+                    else:
+                        grid[ypos][xpos].can_move_left = False
                     if ypos > 0 and xpos < BOARD_SIZE - 1 and grid[ypos - 1][xpos + 1].player_color == None:
                         grid[ypos - 1][xpos + 1].can_move = True
                         grid[ypos][xpos].can_move_right = True
                         grid[ypos - 1][xpos + 1].is_marked = True
+                    else:
+                        grid[ypos][xpos].can_move_right = False
                     #check if the player can move
  
                     #check if the player can jump over an opponent's piece
