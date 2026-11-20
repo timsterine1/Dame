@@ -95,6 +95,13 @@ def get_mouse_pos():
     return ypos // FIELD_SIZE , xpos //FIELD_SIZE
 mouse_was_pressed = False
 def check_moves():
+    for row in grid:
+        for block in row:
+            block.is_marked = False
+            block.can_move = False
+            block.have_to_move = False
+            block.can_move_left = False
+            block.can_move_right = False
 
     if black_player_turn:
         for ypos in range(BOARD_SIZE):
