@@ -94,7 +94,12 @@ def get_mouse_pos():
     ypos = pos[1]
     return ypos // FIELD_SIZE , xpos //FIELD_SIZE
 mouse_was_pressed = False
-def check_moves():
+def check_moves(color):
+    if color == "Black":
+        richtung = -1
+    else:
+        richtung = 1
+
     for row in grid:
         for block in row:
             block.is_marked = False
@@ -103,31 +108,30 @@ def check_moves():
             block.can_move_left = False
             block.can_move_right = False
 
-    if black_player_turn:
-        for ypos in range(BOARD_SIZE):
-            for xpos in range(BOARD_SIZE):
-                if grid[ypos][xpos].is_selected and grid[ypos][xpos].player_color == "Black":
-                    if ypos > 0 and xpos > 0 and grid[ypos - 1][xpos - 1].player_color == None:
-                        grid[ypos - 1][xpos - 1].can_move = True
-                        grid[ypos][xpos].can_move_left = True
-                        grid[ypos - 1][xpos - 1].is_marked = True
-                    else:
-                        grid[ypos][xpos].can_move_left = False
-                    if ypos > 0 and xpos < BOARD_SIZE - 1 and grid[ypos - 1][xpos + 1].player_color == None:
-                        grid[ypos - 1][xpos + 1].can_move = True
-                        grid[ypos][xpos].can_move_right = True
-                        grid[ypos - 1][xpos + 1].is_marked = True
-                    else:
-                        grid[ypos][xpos].can_move_right = False
-                    #check if the player can move
- 
-                    #check if the player can jump over an opponent's piece
-                    if ypos > 1 and xpos > 1 and grid[ypos - 1][xpos - 1].player_color == "White" and grid[ypos - 2][xpos - 2].player_color == None:
-                        grid[ypos - 2][xpos - 2].is_marked = True
-                        grid[ypos][xpos].have_to_move = True
-                    if ypos > 1 and xpos < BOARD_SIZE - 2 and grid[ypos - 1][xpos + 1].player_color == "White" and grid[ypos - 2][xpos + 2].player_color == None:
-                        grid[ypos - 2][xpos + 2].is_marked = True
-                        grid[ypos][xpos].have_to_move = True
+    for ypos in range(BOARD_SIZE):
+        for xpos in range(BOARD_SIZE):
+            if grid[ypos][xpos].is_selected and grid[ypos][xpos].player_color == color:
+                if ypos > 0 and xpos > 0 and grid[ypos + richtung][xpos - 1].player_color == None:
+                    grid[ypos + richtung][xpos - 1].can_move = True
+                    grid[ypos][xpos].can_move_left = True
+                    grid[ypos + richtung][xpos - 1].is_marked = True
+                else:
+                    grid[ypos][xpos].can_move_left = False
+                if ypos > 0 and xpos < BOARD_SIZE - 1 and grid[ypos + richtung][xpos + 1].player_color == None:
+                    grid[ypos + richtung][xpos + 1].can_move = True
+                    grid[ypos][xpos].can_move_right = True
+                    grid[ypos + richtung][xpos + 1].is_marked = True
+                else:
+                    grid[ypos][xpos].can_move_right = False
+                #check if the player can move
+
+                #check if the player can jump over an opponent's piece
+                if ypos > 1 and xpos > 1 and grid[ypos + richtung][xpos - 1].player_color == "White" and grid[ypos +richtung][xpos - 2].player_color == None:
+                    grid[ypos + richtung][xpos - 2].is_marked = True
+                    grid[ypos][xpos].have_to_move = True
+                if ypos > 1 and xpos < BOARD_SIZE - 2 and grid[ypos + richtung][xpos + 1].player_color == "White" and grid[ypos + richtung][xpos + 2].player_color == None:
+                    grid[ypos + richtung][xpos + 2].is_marked = True
+                    grid[ypos][xpos].have_to_move = True
                         
 def move():
     if black_player_turn:
@@ -183,7 +187,7 @@ while game_running:
     
 
     draw_board(grid)
-    check_moves()
+    check_moves("Black" if black_player_turn else "White")
     move()
     pygame.display.flip()
     clock.tick(FPS)
