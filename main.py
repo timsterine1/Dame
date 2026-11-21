@@ -92,7 +92,9 @@ def get_mouse_pos():
     pos = pygame.mouse.get_pos()
     xpos = pos[0]
     ypos = pos[1]
-    return ypos // FIELD_SIZE , xpos //FIELD_SIZE
+    if 0 <= xpos < screen.get_width() and 0 <= ypos < screen.get_height():
+        return ypos // FIELD_SIZE , xpos //FIELD_SIZE
+    return 1 ,0
 mouse_was_pressed = False
 def check_moves(color):
     if color == "Black":
@@ -163,7 +165,6 @@ while game_running:
 
     #check if a tile can be selected
     if mouse_buttons[0]:  # [0] fuer links klick 
-        get_mouse_pos()
         if not mouse_was_pressed: #makes sure that the player can only select one tile at a time
             if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_selected == False and grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color != None:
                 #makes sure that only the player whose turn it is can select a piece
