@@ -73,6 +73,8 @@ def draw_board(grid):
                 pygame.draw.circle(screen, color, (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2), FIELD_SIZE // 2 - 5)
                 pygame.draw.circle(screen, BLACK, (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2), FIELD_SIZE // 2 - 5, 1)
 
+            if grid[ypos][xpos].is_selected:
+                pygame.draw.rect(screen, YELLOW, (xpos * FIELD_SIZE, ypos * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE), 5)
             if grid[ypos][xpos].is_marked:
                 pygame.draw.circle(screen, (128, 128, 128), (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2),10)
 def get_mouse_pos():
@@ -117,7 +119,7 @@ def check_moves(color):
                         grid[ypos + richtung*2][xpos - 2].is_marked = True
                     if grid[ypos][xpos].take_right:
                         grid[ypos + richtung*2][xpos + 2].is_marked = True
-                        
+
                 else:
                     if ypos > 0 and xpos > 0 and grid[ypos + richtung][xpos - 1].player_color == None:
                         grid[ypos][xpos].can_move_left = True
