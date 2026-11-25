@@ -16,7 +16,7 @@ grid = [[2,0,2,0,2,0,2,0],
         [0,2,0,2,0,2,0,2],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
-        [0,0,0,0,2,0,0,0],
+        [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [1,0,1,0,1,0,1,0],
         [0,1,0,1,0,1,0,1]]
@@ -106,10 +106,10 @@ def check_moves(color):
     for ypos in range(BOARD_SIZE):
         for xpos in range(BOARD_SIZE):
              #check if the player can jump over an opponent's piece
-            if ypos > 1 and xpos > 1 and grid[ypos + richtung][xpos - 1].player_color == opponent_color and grid[ypos +richtung*2][xpos - 2].player_color == None and grid[ypos][xpos].player_color == color:
+            if ypos + richtung*2 < BOARD_SIZE and ypos + richtung*2 >= 0 and xpos > 1 and grid[ypos + richtung][xpos - 1].player_color == opponent_color and grid[ypos +richtung*2][xpos - 2].player_color == None and grid[ypos][xpos].player_color == color:
                 grid[ypos][xpos].take_left = True
                 can_jump = True
-            elif ypos > 1 and xpos < BOARD_SIZE - 2 and grid[ypos + richtung][xpos + 1].player_color == opponent_color and grid[ypos + richtung*2][xpos + 2].player_color == None and grid[ypos][xpos].player_color == color:
+            elif ypos + richtung*2 < BOARD_SIZE and ypos + richtung*2 >= 0 and xpos + 2 < BOARD_SIZE and grid[ypos + richtung][xpos + 1].player_color == opponent_color and grid[ypos + richtung*2][xpos + 2].player_color == None and grid[ypos][xpos].player_color == color:
                 grid[ypos][xpos].take_right = True
                 can_jump = True
                 
@@ -121,31 +121,35 @@ def check_moves(color):
                         grid[ypos + richtung*2][xpos + 2].is_marked = True
 
                 else:
-                    if ypos > 0 and xpos > 0 and grid[ypos + richtung][xpos - 1].player_color == None:
+                    if ypos >=   0 and xpos >= 0 and grid[ypos + richtung][xpos - 1].player_color == None:
                         grid[ypos][xpos].can_move_left = True
                         grid[ypos + richtung][xpos - 1].is_marked = True
                     else:
                         grid[ypos][xpos].can_move_left = False
 
-                    if ypos > 0 and xpos < BOARD_SIZE - 1 and grid[ypos + richtung][xpos + 1].player_color == None:
+                    if ypos >= 0 and xpos < BOARD_SIZE - 1 and grid[ypos + richtung][xpos + 1].player_color == None:
                         grid[ypos][xpos].can_move_right = True
                         grid[ypos + richtung][xpos + 1].is_marked = True
                     else:
                         grid[ypos][xpos].can_move_right = False
 
                     
-                        
-def move():
-    if black_player_turn:
-        if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_marked and pygame.mouse.get_pressed()[0]:
-            grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color = "Black"
-            for ypos in range(BOARD_SIZE):
-                for xpos in range(BOARD_SIZE):
-                    if grid[ypos][xpos].is_selected:
-                        grid[ypos][xpos].player_color = None
-                        grid[ypos][xpos].is_selected = False
-                    if grid[ypos][xpos].is_marked:
-                        grid[ypos][xpos].is_marked = False
+def move(color):
+    if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_marked and pygame.mouse.get_pressed()[0]:
+        grid[get_mouse_pos()[0]][get_mouse_pos()[1]].player_color = color
+        for ypos in range(BOARD_SIZE):
+            for xpos in range(BOARD_SIZE):
+                
+                if grid[ypos][xpos].is_selected:
+                    if ypos - get_mouse_pos()[0] == 2 or ypos - get_mouse_pos()[0] == -2:
+                        if xpos - get_mouse_pos()[1] == 2 or xpos - get_mouse_pos()[1] == -2:
+                            grid[(ypos + get_mouse_pos()[0]) // 2][(xpos + get_mouse_pos()[1]) // 2].player_color = None
+                    grid[ypos][xpos].is_selected = False
+                    grid[ypos][xpos].player_color = None
+                grid[ypos][xpos].is_selected = False
+                if grid[ypos][xpos].is_marked:
+                    grid[ypos][xpos].is_marked = False 
+        return True
                        
             
 
@@ -185,13 +189,16 @@ while game_running:
     else:
         mouse_was_pressed = False
 
-    
-
     draw_board(grid)
     check_moves("Black" if black_player_turn else "White")
-    move()
+    if move("Black" if black_player_turn else "White"):
+
+        if black_player_turn:
+            black_player_turn = False
+        else:
+            black_player_turn = True
     pygame.display.flip()
     clock.tick(FPS)
 
 pygame.quit()
-sys.exit()
+sys.exit()                                                                                              
