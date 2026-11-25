@@ -103,6 +103,8 @@ def check_moves(color):
             block.take_right = False
 
     can_jump = False
+    winning_count_black = 0
+    winning_count_white = 0
     for ypos in range(BOARD_SIZE):
         for xpos in range(BOARD_SIZE):
              #check if the player can jump over an opponent's piece
@@ -133,6 +135,46 @@ def check_moves(color):
                     else:
                         grid[ypos][xpos].can_move_right = False
 
+            if grid[ypos][xpos].player_color == "Black":
+                winning_count_black += 1
+            if grid[ypos][xpos].player_color == "White":
+                winning_count_white += 1
+
+    if winning_count_black <= 0:
+        winner = "Weiß"
+    elif winning_count_white <= 0:
+        winner = "Schwarz"
+    else:
+        winner = None
+    #End-screen UI is generated with AI to save time 
+    if winner is not None:
+        close_button = pygame.Rect(300, 450, 200, 60)
+        winner_font = pygame.font.SysFont("Arial", 48, bold=True)
+        while True:
+            screen.fill(WHITE)
+            text = winner_font.render(f"{winner} hat gewonnen!", True, BLACK)
+            text_rect = text.get_rect(center=(screen.get_width() // 2, 350))
+            screen.blit(text, text_rect)
+
+            pygame.draw.rect(screen, (220, 220, 220), close_button)
+            pygame.draw.rect(screen, BLACK, close_button, 2)
+            close_text = MAIN_FONT.render("Fenster schließen", True, BLACK)
+            close_text_rect = close_text.get_rect(center=close_button.center)
+            screen.blit(close_text, close_text_rect)
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and event.button == 1
+                    and close_button.collidepoint(event.pos)
+                ):
+                    pygame.quit()
+                    sys.exit()
+    # End of AI-generated UI
                     
 def move(color):
     if grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_marked and pygame.mouse.get_pressed()[0]:
@@ -150,6 +192,7 @@ def move(color):
                 if grid[ypos][xpos].is_marked:
                     grid[ypos][xpos].is_marked = False 
         return True
+
                        
             
 
