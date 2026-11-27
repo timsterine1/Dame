@@ -12,6 +12,7 @@ class Block:
         self.take_right = False
         self.take_left = False
         self.is_marked = False
+        self.is_queen = False
 grid = [[2,0,2,0,2,0,2,0],
         [0,2,0,2,0,2,0,2],
         [0,0,0,0,0,0,0,0],
@@ -77,6 +78,9 @@ def draw_board(grid):
                 pygame.draw.rect(screen, YELLOW, (xpos * FIELD_SIZE, ypos * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE), 5)
             if grid[ypos][xpos].is_marked:
                 pygame.draw.circle(screen, (128, 128, 128), (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2),10)
+
+            if grid[ypos][xpos].is_queen:
+                pygame.draw.circle(screen, RED, (xpos * FIELD_SIZE + FIELD_SIZE //2, ypos * FIELD_SIZE + FIELD_SIZE // 2), FIELD_SIZE // 2 - 15, 5)
 def get_mouse_pos():
     pos = pygame.mouse.get_pos()
     xpos = pos[0]
@@ -88,10 +92,10 @@ def get_mouse_pos():
 mouse_was_pressed = False
 def check_moves(color):
     if color == "Black":
-        richtung = -1
+        base_richtung = -1
         opponent_color = "White"
     else:
-        richtung = 1
+        base_richtung = 1
         opponent_color = "Black"
 
     for row in grid:
@@ -107,33 +111,51 @@ def check_moves(color):
     winning_count_white = 0
     for ypos in range(BOARD_SIZE):
         for xpos in range(BOARD_SIZE):
-             #check if the player can jump over an opponent's piece
-            if ypos + richtung*2 < BOARD_SIZE and ypos + richtung*2 >= 0 and xpos > 1 and grid[ypos + richtung][xpos - 1].player_color == opponent_color and grid[ypos +richtung*2][xpos - 2].player_color == None and grid[ypos][xpos].player_color == color:
+            #check if the player can jump over an opponent's piece
+            if ypos + base_richtung*2 < BOARD_SIZE and ypos + base_richtung*2 >= 0 and xpos > 1 and grid[ypos + base_richtung][xpos - 1].player_color == opponent_color and grid[ypos +base_richtung*2][xpos - 2].player_color == None and grid[ypos][xpos].player_color == color:
                 grid[ypos][xpos].take_left = True
                 can_jump = True
-            elif ypos + richtung*2 < BOARD_SIZE and ypos + richtung*2 >= 0 and xpos + 2 < BOARD_SIZE and grid[ypos + richtung][xpos + 1].player_color == opponent_color and grid[ypos + richtung*2][xpos + 2].player_color == None and grid[ypos][xpos].player_color == color:
+            elif ypos + base_richtung*2 < BOARD_SIZE and ypos + base_richtung*2 >= 0 and xpos + 2 < BOARD_SIZE and grid[ypos + base_richtung][xpos + 1].player_color == opponent_color and grid[ypos + base_richtung*2][xpos + 2].player_color == None and grid[ypos][xpos].player_color == color:
                 grid[ypos][xpos].take_right = True
                 can_jump = True
                 
             if  grid[ypos][xpos].is_selected and grid[ypos][xpos].player_color == color:
                 if can_jump:
                     if grid[ypos][xpos].take_left:
-                        grid[ypos + richtung*2][xpos - 2].is_marked = True
+                        grid[ypos + base_richtung*2][xpos - 2].is_marked = True
                     if grid[ypos][xpos].take_right:
-                        grid[ypos + richtung*2][xpos + 2].is_marked = True
+                        grid[ypos + base_richtung*2][xpos + 2].is_marked = True
 
                 else:
-                    if ypos >=   0 and xpos >= 0 and grid[ypos + richtung][xpos - 1].player_color == None:
+                    if ypos + base_richtung < BOARD_SIZE and ypos + base_richtung >= 0 and xpos >= 1 and grid[ypos + base_richtung][xpos - 1].player_color == None:
                         grid[ypos][xpos].can_move_left = True
-                        grid[ypos + richtung][xpos - 1].is_marked = True
+                        grid[ypos + base_richtung][xpos - 1].is_marked = True
                     else:
                         grid[ypos][xpos].can_move_left = False
 
-                    if ypos >= 0 and xpos < BOARD_SIZE - 1 and grid[ypos + richtung][xpos + 1].player_color == None:
+                    if ypos + base_richtung < BOARD_SIZE and ypos + base_richtung >= 0 and xpos + 1 < BOARD_SIZE and grid[ypos + base_richtung][xpos + 1].player_color == None:
                         grid[ypos][xpos].can_move_right = True
-                        grid[ypos + richtung][xpos + 1].is_marked = True
+                        grid[ypos + base_richtung][xpos + 1].is_marked = True
                     else:
                         grid[ypos][xpos].can_move_right = False
+                if grid[ypos][xpos].is_queen:
+                    if ypos + 1 < BOARD_SIZE and xpos - 1 >= 0 and grid[ypos + 1][xpos - 1].player_color == None:
+                        grid[ypos + 1][xpos - 1].is_marked = True
+                    if ypos + 1 < BOARD_SIZE and xpos + 1 < BOARD_SIZE and grid[ypos + 1][xpos + 1].player_color == None:
+                        grid[ypos + 1][xpos + 1].is_marked = True
+                    if ypos - 1 >= 0 and xpos - 1 >= 0 and grid[ypos - 1][xpos - 1].player_color == None:
+                        grid[ypos - 1][xpos - 1].is_marked = True
+                    if ypos - 1 >= 0 and xpos + 1 < BOARD_SIZE and grid[ypos - 1][xpos + 1].player_color == None:
+                        grid[ypos - 1][xpos + 1].is_marked = True
+                    if 0 <= ypos - base_richtung*2 < BOARD_SIZE and xpos > 1 and grid[ypos - base_richtung][xpos - 1].player_color == opponent_color and grid[ypos - base_richtung*2][xpos - 2].player_color == None:
+                        grid[ypos - base_richtung*2][xpos - 2].is_marked = True
+                    if 0 <= ypos - base_richtung*2 < BOARD_SIZE and xpos + 2 < BOARD_SIZE and grid[ypos - base_richtung][xpos + 1].player_color == opponent_color and grid[ypos - base_richtung*2][xpos + 2].player_color == None:
+                        grid[ypos - base_richtung*2][xpos + 2].is_marked = True
+
+            if color == "White" and ypos == BOARD_SIZE - 1 and grid[ypos][xpos].player_color == "White":
+                grid[ypos][xpos].is_queen = True
+            if color == "Black" and ypos == 0 and grid[ypos][xpos].player_color == "Black":
+                grid[ypos][xpos].is_queen = True
 
             if grid[ypos][xpos].player_color == "Black":
                 winning_count_black += 1
@@ -183,11 +205,15 @@ def move(color):
             for xpos in range(BOARD_SIZE):
                 
                 if grid[ypos][xpos].is_selected:
+                    grid[get_mouse_pos()[0]][get_mouse_pos()[1]].is_queen = grid[ypos][xpos].is_queen
                     if ypos - get_mouse_pos()[0] == 2 or ypos - get_mouse_pos()[0] == -2:
                         if xpos - get_mouse_pos()[1] == 2 or xpos - get_mouse_pos()[1] == -2:
-                            grid[(ypos + get_mouse_pos()[0]) // 2][(xpos + get_mouse_pos()[1]) // 2].player_color = None
+                            captured_piece = grid[(ypos + get_mouse_pos()[0]) // 2][(xpos + get_mouse_pos()[1]) // 2]
+                            captured_piece.player_color = None
+                            captured_piece.is_queen = False
                     grid[ypos][xpos].is_selected = False
                     grid[ypos][xpos].player_color = None
+                    grid[ypos][xpos].is_queen = False
                 grid[ypos][xpos].is_selected = False
                 if grid[ypos][xpos].is_marked:
                     grid[ypos][xpos].is_marked = False 
